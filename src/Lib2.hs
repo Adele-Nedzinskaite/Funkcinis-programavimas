@@ -27,6 +27,7 @@ data Query
     | ReturnTicket Ticket
     | ChangeConcertInformation Concert
     | CheckAvailableTickets Concert
+    | ShowState  
     deriving (Show)
 
 data Month = January | February | March | April | May | June
@@ -63,7 +64,7 @@ data ConcertTicketsSeller = ConcertTicketsSeller {
 
 parseQuery :: String -> Either String Query
 parseQuery input =
-    case parseString input of  -- Pass the input to parseString
+    case parseString input of  
         Left err -> Left err
         Right (command, remaining) -> 
             if command == "add_concert_tickets_seller" then
@@ -76,19 +77,20 @@ parseQuery input =
                                 Right (AddConcertTicketsSeller name concerts)
 
             else if command == "add_concert" then
-                case parseString remaining of
+                case parseConcert remaining of
                     Left err -> Left err
-                    Right (concertStr, _) ->
-                        fmap (AddConcert . fst) (parseConcert concertStr)
+                    Right (concert, _) -> 
+                        Right (AddConcert concert)
+
 
             else if command == "add_ticket" then
-                case parseString remaining of
+                case parseConcert remaining of
                     Left err -> Left err
-                    Right (concertStr, ticketStr) -> 
-                        case parseConcert concertStr of
+                    Right (concert, remainingAfter) -> 
+                        case parseChar ',' remainingAfter of
                             Left err -> Left err
-                            Right (concert, _) -> 
-                                case parseTicket ticketStr of
+                            Right (_,remainder) ->
+                                case parseTicket remainder of
                                     Left err -> Left err
                                     Right (ticket, _) -> 
                                         Right (AddTicket concert ticket)
@@ -100,34 +102,37 @@ parseQuery input =
                         Right (RemoveConcertTicketsSeller name)
 
             else if command == "remove_concert" then
-                case parseString remaining of
+                case parseConcert remaining of
                     Left err -> Left err
-                    Right (concertStr, _) -> 
-                        fmap (RemoveConcert . fst) (parseConcert concertStr)
+                    Right (concert, _) -> 
+                        Right (RemoveConcert concert)
 
             else if command == "remove_ticket" then
-                case parseString remaining of
+                case parseConcert remaining of
                     Left err -> Left err
-                    Right (concertStr, ticketStr) -> 
-                        case parseConcert concertStr of
+                    Right (concert, remainingAfter) -> 
+                        case parseChar ',' remainingAfter of
                             Left err -> Left err
-                            Right (concert, _) -> 
-                                case parseTicket ticketStr of
+                            Right (_,remainder) ->
+                                case parseTicket remainder of
                                     Left err -> Left err
                                     Right (ticket, _) -> 
                                         Right (RemoveTicket concert ticket)
 
             else if command == "sell_ticket" then
-                case parseString remaining of
-                    Left err -> Left err
-                    Right (ticketStr, _) -> 
-                        fmap (SellTicket . fst) (parseTicket ticketStr)
+                case parseTicket remaining of
+                            Left err -> Left err
+                            Right (ticket,_) ->
+                                Right(SellTicket ticket)
 
             else if command == "return_ticket" then
-                case parseString remaining of
-                    Left err -> Left err
-                    Right (ticketStr, _) -> 
-                        fmap (ReturnTicket . fst) (parseTicket ticketStr)
+                case parseTicket remaining of
+                            Left err -> Left err
+                            Right (ticket,_) ->
+                                Right(ReturnTicket ticket)
+
+            else if command == "show_state" then
+                Right(ShowState)
 
             else
                 Left "Error: Unknown command"
@@ -139,45 +144,52 @@ type Parser a = String -> Either String (a, String)
 emptyState :: State
 emptyState = State { sellerName = "", concerts = [] }
 
-stateTransition :: State -> Query -> Either String State
+stateTransition :: State -> Query -> Either String (Maybe String, State)
 stateTransition st query = case query of
     AddConcertTicketsSeller name concerts -> 
         if not (null (sellerName st))
         then Left "ConcertTicketsSeller already exists."
-        else Right $ st { sellerName = name, concerts = concerts }
+        else Right (Nothing, st { sellerName = name, concerts = concerts })
 
     AddConcert concert -> 
         if any (\c -> title c == title concert && artist c == artist concert && date c == date concert) (concerts st)
         then Left "Concert already exists."
-        else Right $ st { concerts = concert : concerts st }
+        else Right (Nothing, st { concerts = concert : concerts st })
 
     AddTicket concert ticket -> 
-        let updatedConcerts = map (\c -> 
-                if title c == title concert && artist c == artist concert && date c == date concert
-                then c { tickets = ticket : tickets c } 
-                else c) (concerts st)
-        in if any (\c -> title c == title concert && artist c == artist concert && date c == date concert) (concerts st)
-            then Right $ st { concerts = updatedConcerts }
-            else Left "Concert not found."
+        let concertExists = any (\c -> title c == title concert && artist c == artist concert && date c == date concert) (concerts st)
+            ticketExists = any (\t -> id t == id ticket) (concatMap tickets (filter (\c -> title c == title concert && artist c == artist concert && date c == date concert) (concerts st)))
+            updatedConcerts = map (\c -> 
+                    if title c == title concert && artist c == artist concert && date c == date concert
+                    then if not ticketExists 
+                        then c { tickets = ticket : tickets c } 
+                        else c 
+                    else c) (concerts st)
+        in if not concertExists
+            then Left "Concert not found."
+            else if ticketExists
+                then Left "Ticket with the same ID already exists."
+                else Right (Nothing, st { concerts = updatedConcerts })
+
 
     RemoveConcertTicketsSeller name ->
         if sellerName st /= name
         then Left "No such ConcertTicketsSeller exists."
-        else Right $ st { sellerName = "", concerts = [] }
+        else Right (Nothing, st { sellerName = "", concerts = [] })
 
     RemoveConcert concert ->
         let remainingConcerts = filter (\c -> title c /= title concert || artist c /= artist concert || date c /= date concert) (concerts st)
         in if length remainingConcerts == length (concerts st)
             then Left "Concert not found."
-            else Right $ st { concerts = remainingConcerts }
+            else Right (Nothing, st { concerts = remainingConcerts })
 
     RemoveTicket concert ticket -> 
         let updatedConcerts = map (\c -> 
                 if title c == title concert && artist c == artist concert && date c == date concert
-                then c { tickets = filter (/= ticket) (tickets c) } -- Ensure we update the concert tickets correctly
-                else c) (concerts st) -- Keep other concerts unchanged
+                then c { tickets = filter (/= ticket) (tickets c) }
+                else c) (concerts st) 
         in if any (\c -> title c == title concert && artist c == artist concert && date c == date concert && ticket `elem` tickets c) (concerts st)
-            then Right $ st { concerts = updatedConcerts } -- Make sure updatedConcerts is a list of Concert
+            then Right (Nothing, st { concerts = updatedConcerts }) 
             else Left "Ticket not found."
     
     SellTicket ticket -> updateTicketAvailability st ticket "Sold"
@@ -190,25 +202,42 @@ stateTransition st query = case query of
                 then newConcert 
                 else c) (concerts st)
         in if any (\c -> title c == title newConcert && artist c == artist newConcert && date c == date newConcert) (concerts st)
-            then Right $ st { concerts = updatedConcerts }
+            then Right (Nothing, st { concerts = updatedConcerts })
             else Left "Concert not found."
 
     CheckAvailableTickets concert ->
         let availableTickets = concatMap tickets $ filter (\c -> title c == title concert && artist c == artist concert && date c == date concert) (concerts st)
             availableTicketCount = length $ filter (\t -> availability t == "Available") availableTickets
         in if availableTicketCount > 0
-            then Right st  
+            then Right (Nothing, st ) 
             else Left "No available tickets."
 
-updateTicketAvailability :: State -> Ticket -> String -> Either String State
+    ShowState ->
+        Right (Just (show st), st) 
+
+updateTicketAvailability :: State -> Ticket -> String -> Either String (Maybe String, State)
 updateTicketAvailability st ticket newStatus = 
     let updatedConcerts = map (\c -> 
-            if ticket `elem` (tickets c) 
-            then c { tickets = map (\t -> if t == ticket then t { availability = newStatus } else t) (tickets c) } 
-            else c) (concerts st)  
-    in if any (\c -> ticket `elem` (tickets c)) (concerts st)  
-        then Right $ st { concerts = updatedConcerts }  
-        else Left "Ticket not found."  
+            if any (\t -> ticketId t == ticketId ticket) (tickets c) 
+            then c { tickets = map (\t -> if ticketId t == ticketId ticket 
+                                            then t { availability = newStatus } 
+                                            else t) (tickets c) }
+            else c) (concerts st)
+
+        ticketFound = any (\c -> any (\t -> ticketId t == ticketId ticket) (tickets c)) updatedConcerts
+
+        ticketAlready = any (\c -> 
+            any (\t -> ticketId t == ticketId ticket && availability t == newStatus) (tickets c)) (concerts st)
+    in if not ticketFound
+        then Left "Ticket not found."  
+        else if ticketAlready
+            then Left ("Ticket is already " ++ newStatus)  
+            else Right (Nothing, st { concerts = updatedConcerts })
+
+
+
+
+
 
 or2 :: Parser a -> Parser a -> Parser a
 or2 a b = \input -> case a input of
@@ -216,11 +245,11 @@ or2 a b = \input -> case a input of
     Left _ -> b input
 
 parseChar :: Char -> String -> Either String (Char, String)
-parseChar c [] = Left ("Error: empty input")
+parseChar c [] = Left ("Char Error: empty input")
 parseChar c s@(h:t) = if c == h then Right (c, t) else Left (c : " is not found in " ++ s)
 
 parseNumber :: String -> Either String (Int, String)
-parseNumber [] = Left "Error: empty input"
+parseNumber [] = Left " Num Error: empty input"
 parseNumber str =
     let
         digits = L.takeWhile C.isDigit str
@@ -231,7 +260,7 @@ parseNumber str =
             _ -> Right (read digits, rest)
 
 parseString :: String -> Either String (String, String)
-parseString [] = Left "Error: empty input"
+parseString [] = Left "String Error: empty input"
 parseString str = 
     let (beforeComma, rest) = break (== ',') str
     in if null rest
@@ -256,7 +285,7 @@ parsePrice :: String -> Either String (Int, String)
 parsePrice a = parseNumber a
 
 parseType :: String -> Either String (String, String)
-parseType [] = Left "Error: empty input"
+parseType [] = Left "Ticket type Error: empty input"
 parseType a =
     case parseString a of
         Left err -> Left err               
@@ -282,7 +311,7 @@ parseLetterAndDigit (x:y:xs)
 parseLetterAndDigit _ = Left "Error: insufficient input after 'Seat'" 
 
 parseTicket :: String -> Either String (Ticket, String)
-parseTicket [] = Left "Error: empty input"
+parseTicket [] = Left "Ticket Error: empty input"
 parseTicket a = 
     case parseID a of
         Left err -> Left err
@@ -335,20 +364,33 @@ parseConcert str =
                     case parseDate restArtist of
                         Left err -> Left err
                         Right (matchedDate, restDate) -> 
-                            case parseChar ',' restDate of 
-                                Left err -> Left err
-                                Right (_, remaining) ->  
-                                    case parseTicketsList remaining of
-                                        Left err -> Left err
-                                        Right (matchedTicketsList, finalRemaining) ->  
-                                            let concert = Concert
-                                                            {
-                                                                title = matchedTitle,
-                                                                artist = matchedArtist,
-                                                                date = matchedDate,
-                                                                tickets = matchedTicketsList
-                                                            }
-                                            in Right (concert, finalRemaining)
+                            -- Check if the remaining string is empty
+                            if null restDate then
+                                let concert = Concert
+                                                {
+                                                    title = matchedTitle,
+                                                    artist = matchedArtist,
+                                                    date = matchedDate,
+                                                    tickets = []
+                                                }
+                                in Right (concert, restDate)
+                            else 
+                                case parseChar ',' restDate of 
+                                    Left err -> Left err
+                                    Right (_, remaining) ->  
+                                        case parseTicketsList remaining of
+                                            Left err -> Left err
+                                            Right (matchedTicketsList, finalRemaining) ->  
+                                                let concert = Concert
+                                                                {
+                                                                    title = matchedTitle,
+                                                                    artist = matchedArtist,
+                                                                    date = matchedDate,
+                                                                    tickets = matchedTicketsList
+                                                                }
+                                                in Right (concert, finalRemaining)
+
+
         
 parseConcertList :: String -> Either String ([Concert], String)
 parseConcertList input = parseConcerts input []

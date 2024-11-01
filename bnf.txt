@@ -1,4 +1,4 @@
---README removed ',' as a char, since, there occured problems parsing strings. In line 32 replaced ' ' to ',' due to the same reasons.
+--README removed ',' as a char, since, there occured problems parsing strings. In line 32 replaced ' ' to ',' due to the same reasons. Changed ',' to ",," in line 36 to seperate tickets that are already in cocnert 
 
 Domain - "Concert tickets seller"
 
@@ -33,6 +33,6 @@ type = "Seat" ',' upper digit ( "Standing" | "VIP" | "Group seated" | "Group sta
 availability = "Available" | "Sold"
 price = number
 
-commands = "add_concert_tickets_seller" concert_tickets_seller | "add_concert" concert_list ',' concert | "add_ticket" concert ',' ticket
+commands = "add_concert_tickets_seller" concert_tickets_seller | "add_concert" concert_list ',' concert | "add_ticket" concert ",," ticket
 | "remove_concert_tickets_seller" concert_tickets_seller | "remove_concert" (concert_list ',' concert) | "remove_ticket" concert ',' ticket,
 "sell_ticket" ticket | "return_ticket" ticket | "change_concert_information" concert | "check_available_tickets" concert
