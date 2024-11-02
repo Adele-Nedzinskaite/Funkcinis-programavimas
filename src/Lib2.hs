@@ -4,7 +4,11 @@ module Lib2
       parseQuery,
       State(..),
       emptyState,
-      stateTransition
+      stateTransition,
+      Ticket(..),
+      Concert(..),
+      Date(..),
+      Month(..)
     ) where
 
 import qualified Data.Char as C
@@ -14,7 +18,7 @@ import Data.Char (isUpper, isDigit)
 data State = State {
     sellerName :: String,
     concerts :: [Concert] 
-}deriving (Show)
+}deriving (Show,Eq)
 
 data Query
     = AddConcertTicketsSeller String [Concert]
@@ -27,8 +31,9 @@ data Query
     | ReturnTicket Ticket
     | ChangeConcertInformation Concert
     | CheckAvailableTickets Concert
+    | UpdateConcert Concert Concert
     | ShowState  
-    deriving (Show)
+    deriving (Show,Eq)
 
 data Month = January | February | March | April | May | June
            | July | August | September | October | November | December
@@ -130,12 +135,30 @@ parseQuery input =
                             Left err -> Left err
                             Right (ticket,_) ->
                                 Right(ReturnTicket ticket)
+            
+            else if command == "change_concert_information" then
+                case parseConcert remaining of
+                    Left err -> Left err
+                    Right (concertToChange, remainingAfter) -> 
+                        case parseChar ',' remainingAfter of
+                            Left err -> Left err
+                            Right (_, remainder) -> 
+                                case parseConcert remainder of
+                                    Left err -> Left err
+                                    Right (updatedConcert, _) -> 
+                                        Right (UpdateConcert concertToChange updatedConcert)
+
+            else if command == "check_available_tickets" then
+                case parseConcert remaining of
+                Left err -> Left err
+                Right(concert,_) ->
+                    Right(CheckAvailableTickets concert)
 
             else if command == "show_state" then
                 Right(ShowState)
 
             else
-                Left "Error: Unknown command"
+                Left ("Unknown command " ++ input)
 
 
 
@@ -158,7 +181,7 @@ stateTransition st query = case query of
 
     AddTicket concert ticket -> 
         let concertExists = any (\c -> title c == title concert && artist c == artist concert && date c == date concert) (concerts st)
-            ticketExists = any (\t -> id t == id ticket) (concatMap tickets (filter (\c -> title c == title concert && artist c == artist concert && date c == date concert) (concerts st)))
+            ticketExists = any (\t -> ticketId t == ticketId ticket) (concatMap tickets (filter (\c -> title c == title concert && artist c == artist concert && date c == date concert) (concerts st)))
             updatedConcerts = map (\c -> 
                     if title c == title concert && artist c == artist concert && date c == date concert
                     then if not ticketExists 
@@ -171,6 +194,15 @@ stateTransition st query = case query of
                 then Left "Ticket with the same ID already exists."
                 else Right (Nothing, st { concerts = updatedConcerts })
 
+    UpdateConcert concertToChange updatedConcert -> 
+        let concertExists = any (\c -> title c == title concertToChange && artist c == artist concertToChange && date c == date concertToChange) (concerts st)
+            updatedConcerts = map (\c -> 
+                    if title c == title concertToChange && artist c == artist concertToChange && date c == date concertToChange
+                    then updatedConcert 
+                    else c) (concerts st)
+        in if not concertExists
+            then Left "Concert not found."
+            else Right (Nothing, st { concerts = updatedConcerts })
 
     RemoveConcertTicketsSeller name ->
         if sellerName st /= name
@@ -205,12 +237,13 @@ stateTransition st query = case query of
             then Right (Nothing, st { concerts = updatedConcerts })
             else Left "Concert not found."
 
-    CheckAvailableTickets concert ->
+    CheckAvailableTickets concert -> 
         let availableTickets = concatMap tickets $ filter (\c -> title c == title concert && artist c == artist concert && date c == date concert) (concerts st)
             availableTicketCount = length $ filter (\t -> availability t == "Available") availableTickets
         in if availableTicketCount > 0
-            then Right (Nothing, st ) 
+            then Right (Just (show availableTicketCount), st) 
             else Left "No available tickets."
+
 
     ShowState ->
         Right (Just (show st), st) 
@@ -233,11 +266,6 @@ updateTicketAvailability st ticket newStatus =
         else if ticketAlready
             then Left ("Ticket is already " ++ newStatus)  
             else Right (Nothing, st { concerts = updatedConcerts })
-
-
-
-
-
 
 or2 :: Parser a -> Parser a -> Parser a
 or2 a b = \input -> case a input of

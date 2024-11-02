@@ -1,4 +1,5 @@
---README removed ',' as a char, since, there occured problems parsing strings. In line 32 replaced ' ' to ',' due to the same reasons. Changed ',' to ",," in line 36 to seperate tickets that are already in cocnert 
+--README removed ',' as a char, since, there occured problems parsing strings. In line 32 replaced ' ' to ',' due to the same reasons. Changed ',' to ",," in several places to seperate tickets that are already in concert
+--added command show_state, added necessary parameter to change_concert_information
 
 Domain - "Concert tickets seller"
 
@@ -33,6 +34,6 @@ type = "Seat" ',' upper digit ( "Standing" | "VIP" | "Group seated" | "Group sta
 availability = "Available" | "Sold"
 price = number
 
-commands = "add_concert_tickets_seller" concert_tickets_seller | "add_concert" concert_list ',' concert | "add_ticket" concert ",," ticket
-| "remove_concert_tickets_seller" concert_tickets_seller | "remove_concert" (concert_list ',' concert) | "remove_ticket" concert ',' ticket,
-"sell_ticket" ticket | "return_ticket" ticket | "change_concert_information" concert | "check_available_tickets" concert
+commands = "add_concert_tickets_seller" ',' concert_tickets_seller | "add_concert" concert_list ',' concert | "add_ticket" concert ",," ticket
+| "remove_concert_tickets_seller" concert_tickets_seller | "remove_concert" (concert_list ',' concert) | "remove_ticket" concert ',,' ticket,
+"sell_ticket" ticket | "return_ticket" ticket | "change_concert_information" (concert ',,' concert) | "check_available_tickets" concert | show_state

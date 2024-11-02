@@ -1,0 +1,44 @@
+>>> add_concert_tickets_seller,Organizatorius
+>>> show_state
+State {sellerName = "Organizatorius", concerts = []}
+
+>>> add_concert,Title,Artist,2000-January-1
+>>> show_state
+State {sellerName = "Organizatorius", concerts = [Concert {title = "Title", artist = "Artist", date = Date {year = 2000, hyphen1 = '-', month = January, hyphen2 = '-', day = 1}, tickets = []}]}
+
+>>> add_ticket,Title,Artist,2000-January-1,,001,Seat,A1VIP,Sold,100
+>>> show_state
+State {sellerName = "Organizatorius", concerts = [Concert {title = "Title", artist = "Artist", date = Date {year = 2000, hyphen1 = '-', month = January, hyphen2 = '-', day = 1}, tickets = [Ticket {ticketId = 1, ticketType = "Seat,A1VIP", availability = "Sold", price = 100}]}]}
+
+>>> sell_ticket,001,Seat,A1VIP,Sold,100
+ERROR:Ticket is already Sold
+
+>>> return_ticket,001,Seat,A1VIP,Sold,100
+>>> show_state
+State {sellerName = "Organizatorius", concerts = [Concert {title = "Title", artist = "Artist", date = Date {year = 2000, hyphen1 = '-', month = January, hyphen2 = '-', day = 1}, tickets = [Ticket {ticketId = 1, ticketType = "Seat,A1VIP", availability = "Available", price = 100}]}]}
+
+>>> sell_ticket,001,Seat,A1VIP,Available,100
+>>> show_state
+State {sellerName = "Organizatorius", concerts = [Concert {title = "Title", artist = "Artist", date = Date {year = 2000, hyphen1 = '-', month = January, hyphen2 = '-', day = 1}, tickets = [Ticket {ticketId = 1, ticketType = "Seat,A1VIP", availability = "Sold", price = 100}]}]}
+
+>>> change_concert_information,Title,Artist,2000-January-1,1,Seat,A1VIP,Sold,100,,Title1,Artist1,2000-January-1,1,Seat,A1VIP,Sold,100
+>>> show_state
+State {sellerName = "Organizatorius", concerts = [Concert {title = "Title1", artist = "Artist1", date = Date {year = 2000, hyphen1 = '-', month = January, hyphen2 = '-', day = 1}, tickets = [Ticket {ticketId = 1, ticketType = "Seat,A1VIP", availability = "Sold", price = 100}]}]}
+
+>>> remove_ticket,Title1,Artist1,2000-January-1,,1,Seat,A1VIP,Sold,100
+>>> show_state
+State {sellerName = "Organizatorius", concerts = [Concert {title = "Title1", artist = "Artist1", date = Date {year = 2000, hyphen1 = '-', month = January, hyphen2 = '-', day = 1}, tickets = []}]}
+
+>>> remove_concert,Title1,Artist1,2000-January-1
+>>> show_state
+State {sellerName = "Organizatorius", concerts = []}
+
+>>> remove_concert_tickets_seller,Organizatorius
+>>> show_state
+State {sellerName = "", concerts = []}
+
+>>> add_ticket,Title,Artist,2000-January-1,,1,Seat,A1VIP,Sold,100
+>>> add_ticket,Title,Artist,2000-May-1,,2,Seat,A2VIP,Available,100
+>>> add_ticket,Title,Artist,2000-May-1,,3,Seat,A3VIP,Available,100
+>>> check_available_tickets,Title,Artist,2000-January-1
+2
