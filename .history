@@ -1,15 +1,100 @@
 show_state
-sell_ticket,222,Seat,B8VIP,Sold,3
-sell_ticket,Pav,Art,2000-May-1,,222,Seat,B8VIP,Sold,3
-add_ticket,Pav1,Art,2000-May-1,,222,Seat,B8VIP,Sold,3
-add_ticket,Pav,Art,2000-May-1,,222,Seat,B8VIP,Sold,3
-add_ticket,Pav,Art,2000-May-1,1322,Seat,B9VIP,Sold,3
-add_ticket Pav,Art,2000-May-1,1322,Seat,B9VIP,Sold,3
-add_tikcet Pav,Art,2000-May-1,1322,Seat,B9VIP,Sold,3
-add_tikcet Pav,Art,2000-May-1,1322,Seat,B9VIP,Sold,3
-add_concert,Pav,Art,2000-May-1,12,Seat,B9VIP,Sold,3
-add_ticket,Pav,Art,2000-May-1,12,Seat,B9VIP,Sold,3
-add_ticket Pav,Art,2000-May-1,12,Seat,B9VIP,Sold,3
-add_tikcet Pav,Art,2000-May-1,12,Seat,B9VIP,Sold,3
-add_concert_tickets_seller,Organizatorius
-add_concert_tickets_seller
+LOAD
+SAVE
+show_state
+END
+add_ticket,taitlas,atlikejas,2000-May-1,,4,Seat,A9VIP,Sold,3
+add_ticket,taitlas,atlikejas,2000-May-1,,3,Seat,A9VIP,Sold,3
+add_ticket,taitlas,atlikejas,2000-May-1,,1,Seat,A9VIP,Sold,3
+add_concert_tickets_seller,Organizatorius,taitlas,atlikejas,2000-May-1,taitlaqs,atlikwejas,21
+BEGIN
+:paste
+show_state
+LOAD
+SAVE
+show_state
+END
+add_ticket,taitlas,atlikejas,2000-May-1,,4,Seat,A9VIP,Sold,3
+add_ticket,taitlas,atlikejas,2000-May-1,,3,Seat,A9VIP,Sold,3
+add_ticket,taitlas,atlikejas,2000-May-1,,1,Seat,A9VIP,Sold,3
+add_concert_tickets_seller,Organizatorius,taitlas,atlikejas,2000-May-1,taitlaqs,atlikwejas,21
+BEGIN
+:paste
+show_state
+LOAD
+SAVE
+show_state
+END
+add_ticket,taitlas,atlikejas,2000-May-1,,4,Seat,A9VIP,Sold,3
+add_ticket,taitlas,atlikejas,2000-May-1,,3,Seat,A9VIP,Sold,3
+add_ticket,taitlas,atlikejas,2000-May-1,,1,Seat,A9VIP,Sold,3
+add_concert_tickets_seller,Organizatorius,taitlas,atlikejas,2000-May-1,taitlaqs,atlikwejas,21
+BEGIN
+:paste
+show_state
+LOAD
+SAVE
+show_state
+END
+add_ticket,taitlas,atlikejas,2000-May-1,,4,Seat,A9VIP,Sold,3
+add_ticket,taitlas,atlikejas,2000-May-1,,3,Seat,A9VIP,Sold,3
+add_ticket,taitlas,atlikejas,2000-May-1,,1,Seat,A9VIP,Sold,3
+add_concert_tickets_seller,Organizatorius,taitlas,atlikejas,2000-May-1,taitlaqs,atlikwejas,21
+BEGIN
+:paste
+END
+ add_ticket,taitlas,atlikejas,2000-May-1,,4,Seat,A9VIP,Sold,3
+ add_ticket,taitlas,atlikejas,2000-May-1,,3,Seat,A9VIP,Sold,3
+ add_ticket,taitlas,atlikejas,2000-May-1,,1,Seat,A9VIP,Sold,3
+ add_concert_tickets_seller,Organizatorius,taitlas,atlikejas,2000-May-1,taitlaqs,atlikwejas,21
+BEGIN
+:paste
+| END
+| add_ticket,taitlas,atlikejas,2000-May-1,,4,Seat,A9VIP,Sold,3
+| add_ticket,taitlas,atlikejas,2000-May-1,,3,Seat,A9VIP,Sold,3
+| add_ticket,taitlas,atlikejas,2000-May-1,,1,Seat,A9VIP,Sold,3
+| add_concert_tickets_seller,Organizatorius,taitlas,atlikejas,2000-May-1,taitlaqs,atlikwejas,21
+| BEGIN
+:paste
+removeConcertTicketsSeller
+removeConcertTicketsSeller
+END
+add_ticket,taitlas,atlikejas,2000-May-1,,4,Seat,A9VIP,Sold,3
+add_ticket,taitlas,atlikejas,2000-May-1,,3,Seat,A9VIP,Sold,3
+add_ticket,taitlas,atlikejas,2000-May-1,,1,Seat,A9VIP,Sold,3
+add_concert_tickets_seller,Organizatorius,taitlas,atlikejas,2000-May-1,taitlaqs,atlikwejas,2010-May-1
+BEGIN
+:paste
+show_state
+LOAD
+add_concert_tickets_seller,arabas,[Title,Artist,2000-January-1,[1,"Seat,A1VIP","Sold",100],[taitlas,atlikejas,2000-May-1,[]]
+show_state
+LOAD
+show_state
+LOAD
+show_state
+LOAD
+SAVE
+show_state
+add_ticket,Title,Artist,2000-January-1,,001,Seat,A1VIP,Sold,100
+add_concert,Title,Artist,2000-January-1
+add_ticket,taitlas,atlikejas,2000-May-1,,
+show_state
+add_ticket,taitlas,atlikejas,2000-May-1,,1,Seat,A9VIP,Sold,3
+add_ticket,taitlas,atlikejas,2000-May-1 ,,1,Seat,A9VIP,Sold,3
+add_ticket,taitlas,atlikejas,2000-May-1,,1,Seat,A9VIP,Sold,3
+add_ticket,taitlas,atlikejas,2000-May-1,1,Seat,A9VIP,Sold,3
+show_state
+LOAD
+add_concert_tickets_seller,
+AddConcertTicketsSeller,
+LOAD
+SAVE
+show_state
+END
+add_concert,taitlas,atlikejas,2000-May-1
+add_concert_tickets_seller,arabas
+BEGIN
+:paste
+show_state
+LOAD

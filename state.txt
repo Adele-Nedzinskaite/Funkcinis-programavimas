@@ -1,0 +1,4 @@
+BEGIN
+remove_concert_tickets_seller
+add_concert_tickets_seller,Organizatorius,taitlas,atlikejas,2000-May-1,4,Seat,A9VIP,Sold,3,3,Seat,A9VIP,Sold,3,1,Seat,A9VIP,Sold,3
+END

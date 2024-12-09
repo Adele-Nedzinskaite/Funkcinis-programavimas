@@ -22,6 +22,7 @@ description:         Please see the README on GitHub at <https://github.com/gith
 dependencies:
 - base >= 4.7 && < 5
 
+
 ghc-options:
 - -Wall
 - -Wcompat
@@ -35,10 +36,15 @@ ghc-options:
 
 library:
   source-dirs: src
+  exposed-modules:
+    - Lib1
+    - Lib2
+    - Lib3
   dependencies:
   - random
   - stm
   - async
+  - tasty-quickcheck
 
 executables:
   fp2024-one:
@@ -87,6 +93,7 @@ tests:
     - fp2024
     - tasty
     - tasty-hunit
+    - tasty-quickcheck
   fp2024-doctest:
     main:                Doctest.hs
     source-dirs:         doctest

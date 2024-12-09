@@ -27,7 +27,7 @@ data Query
   = AddConcertTicketsSeller String [Concert]
   | AddConcert Concert
   | AddTicket Concert Ticket
-  | RemoveConcertTicketsSeller String
+  | RemoveConcertTicketsSeller
   | RemoveConcert Concert
   | RemoveTicket Concert Ticket
   | SellTicket Ticket
@@ -59,7 +59,11 @@ data Concert = Concert
     date :: Date,
     tickets :: [Ticket]
   }
-  deriving (Show, Eq)
+  deriving (Eq)
+
+instance Show Concert where
+  show Concert {title = t, artist = a, date = d, tickets = ts} =
+    t ++ "," ++ a ++ "," ++ show d ++ "," ++ show ts
 
 data Date = Date
   { year :: Int,
@@ -68,7 +72,11 @@ data Date = Date
     hyphen2 :: Char,
     day :: Int
   }
-  deriving (Show, Eq)
+  deriving (Eq)
+
+instance Show Date where
+  show Date {year = y, hyphen1 = h1, month = m, hyphen2 = h2, day = d} =
+    show y ++ "-" ++ show m ++ "-" ++ show d
 
 data Ticket = Ticket
   { ticketId :: Int,
@@ -76,7 +84,11 @@ data Ticket = Ticket
     availability :: String,
     price :: Int
   }
-  deriving (Show, Eq)
+  deriving (Eq)
+
+instance Show Ticket where
+  show Ticket {ticketId = tID, ticketType = tT, availability = a, price = p} =
+    show tID ++ "," ++ tT ++ "," ++ a ++ "," ++ show p
 
 data ConcertTicketsSeller = ConcertTicketsSeller
   { organizationName :: String,
@@ -116,10 +128,7 @@ parseQuery input =
                             Right (AddTicket concert ticket)
                 else
                   if command == "remove_concert_tickets_seller"
-                    then case parseString remaining of
-                      Left err -> Left err
-                      Right (name, _) ->
-                        Right (RemoveConcertTicketsSeller name)
+                    then Right (RemoveConcertTicketsSeller)
                     else
                       if command == "remove_concert"
                         then case parseConcert remaining of
@@ -223,10 +232,8 @@ stateTransition st query = case query of
      in if not concertExists
           then Left "Concert not found."
           else Right (Nothing, st {concerts = updatedConcerts})
-  RemoveConcertTicketsSeller name ->
-    if sellerName st /= name
-      then Left "No such ConcertTicketsSeller exists."
-      else Right (Nothing, st {sellerName = "", concerts = []})
+  RemoveConcertTicketsSeller ->
+    Right (Nothing, st {sellerName = "", concerts = []})
   RemoveConcert concert ->
     let remainingConcerts = filter (\c -> title c /= title concert || artist c /= artist concert || date c /= date concert) (concerts st)
      in if length remainingConcerts == length (concerts st)
@@ -426,7 +433,6 @@ parseConcert str =
           case parseDate restArtist of
             Left err -> Left err
             Right (matchedDate, restDate) ->
-              -- Check if the remaining string is empty
               if null restDate
                 then
                   let concert =
