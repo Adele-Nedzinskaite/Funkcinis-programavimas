@@ -21,6 +21,8 @@ description:         Please see the README on GitHub at <https://github.com/gith
 
 dependencies:
 - base >= 4.7 && < 5
+- directory
+- QuickCheck
 
 ghc-options:
 - -Wall
@@ -43,7 +45,6 @@ library:
   - QuickCheck
   - transformers
   - strict
-  - deepseq
 
 executables:
   fp2024-one:
@@ -76,6 +77,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - fp2024
+    - directory
     - repline
     - mtl
     - stm
@@ -89,6 +91,7 @@ executables:
     dependencies:
     - fp2024
     - repline
+    - free
     - lens
     - wreq
     - bytestring
@@ -103,7 +106,9 @@ executables:
     dependencies:
     - fp2024
     - repline
+    - stm
     - scotty
+    - mtl
     - string-conversions
 
 tests:

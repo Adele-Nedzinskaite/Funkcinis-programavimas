@@ -1,3 +1,9 @@
+BEGIN
+add_concert,taitlas,atlikejas,2000-May-1
+add_ticket,c,j,2016-December-28,949,Seat,A1VIP,Sold,215,,228,Seat,A1VIP,Sold,953
+add_ticket,c,j,2016-December-28,949,Seat,A1VIP,Sold,215,,228,Seat,A1VIP,Sold,953
+add_ticket,c,j,2016-December-28,949,Seat,A1VIP,Sold,215,,228,Seat,A1VIP,Sold,953
+add_concert,c,j,2016-December-28
 add_ticket,c,j,2016-December-28,949,Seat,A1VIP,Sold,215,,228,Seat,A1VIP,Sold,953
 add_concert,c,j,2016-December-28
 add_ticket,c,j,2016-December-28,949,Seat,A1VIP,Sold,215,,228,Seat,A1VIP,Sold,953
@@ -92,9 +98,3 @@ show_state
 LOAD
 SAVE
 show_state
-END
-add_ticket,taitlas,atlikejas,2000-May-1,,4,Seat,A9VIP,Sold,3
-add_ticket,taitlas,atlikejas,2000-May-1,,3,Seat,A9VIP,Sold,3
-add_ticket,taitlas,atlikejas,2000-May-1,,1,Seat,A9VIP,Sold,3
-add_concert_tickets_seller,Organizatorius,taitlas,atlikejas,2000-May-1,taitlaqs,atlikwejas,21
-BEGIN
