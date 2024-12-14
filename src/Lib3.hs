@@ -159,8 +159,6 @@ renderQuery (Lib2.ReturnTicket ticket) =
   "return_ticket" ++ "," ++ show ticket
 renderQuery (Lib2.RemoveTicket concert ticket) =
   "remove_ticket" ++ "," ++ showConcertAlt concert ++ ",," ++ show ticket
-renderQuery (Lib2.UpdateConcert concert1 concert2) =
-  "change_concert_information_concert" ++ "," ++ showConcertAlt concert1 ++ ",," ++ showConcertAlt concert2
 renderQuery (Lib2.CheckAvailableTickets concert) =
   "check_available_tickets" ++ "," ++ showConcertAlt concert
 renderQuery Lib2.ShowState =

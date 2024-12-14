@@ -1,6 +1,6 @@
 cabal-version: 2.2
 
--- This file has been generated from package.yaml by hpack version 0.36.0.
+-- This file has been generated from package.yaml by hpack version 0.37.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -25,22 +25,10 @@ source-repository head
 
 library
   exposed-modules:
-      Lessons.Lesson01
-      Lessons.Lesson02
-      Lessons.Lesson03
-      Lessons.Lesson04
-      Lessons.Lesson05
-      Lessons.Lesson06
-      Lessons.Lesson07
-      Lessons.Lesson08
-      Lessons.Lesson09
-      Lessons.Lesson10
-      Lessons.Lesson11
-      Lessons.Lesson12
-      Lessons.Lesson14
       Lib1
       Lib2
       Lib3
+      Parsers
   other-modules:
       Paths_fp2024
   autogen-modules:
