@@ -92,6 +92,7 @@ executables:
     - fp2024
     - repline
     - free
+    - stm
     - lens
     - wreq
     - bytestring

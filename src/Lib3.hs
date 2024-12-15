@@ -10,6 +10,7 @@ module Lib3
     marshallState,
     renderStatements,
     Statements (..),
+    Command (..),
   )
 where
 
@@ -130,10 +131,14 @@ renderStatements (Single query) = renderQuery query
 
 showConcertAlt :: Lib2.Concert -> String
 showConcertAlt Lib2.Concert {Lib2.title = t, Lib2.artist = a, Lib2.date = d, Lib2.tickets = ts} =
-  t ++ "," ++ a ++ "," ++ show d ++ 
-  if null ts 
-    then "" 
-    else "," ++ renderList1 ts
+  t
+    ++ ","
+    ++ a
+    ++ ","
+    ++ show d
+    ++ if null ts
+      then ""
+      else "," ++ renderList1 ts
 
 renderList :: [Lib2.Concert] -> String
 renderList [] = "" -- Base case: empty list produces an empty string
